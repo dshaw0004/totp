@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>gauth-vault</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <h1>gauth-vault</h1>
+    <button id="lockBtn" class="icon-btn" title="Lock" hidden>&#128274;</button>
+  </header>
+
+  <main id="app">
+    <!-- populated by popup.js depending on state: setup / unlock / main -->
+    <p id="statusMsg" class="muted">Loading…</p>
+  </main>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
