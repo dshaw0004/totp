@@ -73,41 +73,60 @@ export default function App() {
         <WelcomeScreen />
       </box>
     );
-  } else if (selectedScreen == 'manual_entry') {
-    return (
-      <ManualEntryScreen />
-    );
   }
-
   return (
-    <box flexGrow={1}>
-      <box flexGrow={2} flexDirection='row'>
-        <box borderStyle='rounded' flexGrow={2} title="Accounts" titleAlignment='left' borderColor={'green'}>
-          <select
-            focused={true}
-            options={accounts.map(a => ({name: a.name, description: a.issuer, value: a.id}))}
-            onChange={(_index, option) => setSelectedAccountId(option?.value || 0)}
-            onSelect={(params) => console.log(params)}
-            flexGrow={1}
-            flexBasis={0}
-          />
-        </box>
-        <box borderStyle='rounded' flexGrow={2} borderColor={'green'}>
+    <box flexGrow={1} flexDirection='row'>
+      <box flexGrow={1} borderStyle='rounded' title="Menu" titleAlignment='left' borderColor={'green'}>
+        <select
+          options={[{
+            name: 'Home',
+            description: 'Home',
+            value: 'main',
+          },
           {
-            (!!selectedAccountId && !!selectedAccount) ? (<>
-                <text>Name: { selectedAccount.name}</text>
-                <text>Issuer: { selectedAccount.issuer}</text>
-                <text>Time left: 30s</text>
-                <text>Code: {selectedAccountCode}</text>
-            </>)
-              : (
-                <box flexGrow={1} justifyContent='center' alignItems='center'>
-                  <text>Please Select an account</text>
-                </box>
-              )
-          }
-        </box>
+            name: 'New',
+            description: 'add new',
+            value: 'manual_entry',
+          }]}
+          onChange={(_index, option) => setSelectedScreen(option?.value || 'main')}
+          minWidth={16}
+          flexGrow={1}
+          flexBasis={0}
+        />
       </box>
+      {
+        selectedScreen === 'manual_entry' ? (
+          <ManualEntryScreen />
+        ) : (
+          <box flexGrow={2}>
+            <box borderStyle='rounded' flexGrow={2} title="Accounts" titleAlignment='left' borderColor={'green'}>
+              <select
+                focused={true}
+                options={accounts.map(a => ({name: a.name, description: a.issuer, value: a.id}))}
+                onChange={(_index, option) => setSelectedAccountId(option?.value || 0)}
+                onSelect={(params) => console.log(params)}
+                flexGrow={1}
+                flexBasis={0}
+              />
+            </box>
+            <box borderStyle='rounded' flexGrow={2} borderColor={'green'}>
+              {
+                (!!selectedAccountId && !!selectedAccount) ? (<>
+                    <text>Name: { selectedAccount.name}</text>
+                    <text>Issuer: { selectedAccount.issuer}</text>
+                    <text>Time left: 30s</text>
+                    <text>Code: {selectedAccountCode}</text>
+                </>)
+                  : (
+                    <box flexGrow={1} justifyContent='center' alignItems='center'>
+                      <text>Please Select an account</text>
+                    </box>
+                  )
+              }
+            </box>
+          </box>
+        )
+      }
     </box>
   );
 }
