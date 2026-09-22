@@ -59,7 +59,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           chrome.notifications.create({
             type: "basic",
             iconUrl: "icons/icon128.png",
-            title: "gauth-vault",
+            title: "totp",
             message: "QR code found — open the extension to add it.",
           });
         } else {

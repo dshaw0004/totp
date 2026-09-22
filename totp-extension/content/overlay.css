@@ -1,4 +1,4 @@
-#gauth-vault-overlay {
+#totp-overlay {
   position: fixed;
   inset: 0;
   z-index: 2147483647;
@@ -6,7 +6,7 @@
   cursor: crosshair;
 }
 
-#gauth-vault-overlay-hint {
+#totp-overlay-hint {
   position: fixed;
   top: 16px;
   left: 50%;
@@ -19,7 +19,7 @@
   pointer-events: none;
 }
 
-#gauth-vault-selection-box {
+#totp-selection-box {
   position: fixed;
   display: none;
   border: 2px solid #4caf50;

@@ -1,6 +1,6 @@
 import { deriveKey, encryptJSON, decryptJSON, randomBytes, bytesToB64, exportKeyRaw, importKeyRaw } from "./crypto.js";
 
-const VERIFIER_PLAINTEXT = "gauth-vault-ok";
+const VERIFIER_PLAINTEXT = "totp-ok";
 
 async function getLocal(keys) {
   return new Promise((resolve) => chrome.storage.local.get(keys, resolve));

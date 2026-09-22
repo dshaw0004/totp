@@ -1,17 +1,17 @@
 (() => {
   // Avoid double-injecting if triggered twice.
-  if (document.getElementById("gauth-vault-overlay")) return;
+  if (document.getElementById("totp-overlay")) return;
 
   const overlay = document.createElement("div");
-  overlay.id = "gauth-vault-overlay";
+  overlay.id = "totp-overlay";
 
   const hint = document.createElement("div");
-  hint.id = "gauth-vault-overlay-hint";
+  hint.id = "totp-overlay-hint";
   hint.textContent = "Drag a box around the QR code. Press Esc to cancel.";
   overlay.appendChild(hint);
 
   const selectionBox = document.createElement("div");
-  selectionBox.id = "gauth-vault-selection-box";
+  selectionBox.id = "totp-selection-box";
   overlay.appendChild(selectionBox);
 
   document.documentElement.appendChild(overlay);

@@ -1,4 +1,4 @@
-# gauth-vault (browser extension)
+# totp (browser extension)
 
 Self-hosted authenticator. Scans QR codes directly on the page, stores
 secrets encrypted with a master password, generates TOTP/HOTP codes on

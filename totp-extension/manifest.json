@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "gauth-vault",
+  "name": "totp",
   "version": "0.1.0",
   "description": "Self-hosted authenticator: scan QR codes on-page, store secrets encrypted, generate TOTP/HOTP codes on demand.",
   "permissions": ["storage", "activeTab", "tabs", "scripting", "notifications"],
@@ -13,8 +13,14 @@
     }
   },
   "background": {
-    "service_worker": "background.js",
+    "scripts": ["background.js"],
     "type": "module"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "totp@dshaw.dev",
+      "strict_min_version": "109.0"
+    }
   },
   "icons": {
     "16": "icons/icon16.png",
