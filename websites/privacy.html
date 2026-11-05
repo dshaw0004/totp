@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy Policy — totp</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --fg: #1a1a1a;
+      --muted: #555;
+      --bg: #fff;
+      --border: #e0e0e0;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --fg: #eee;
+        --muted: #aaa;
+        --bg: #121212;
+        --border: #333;
+      }
+    }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      color: var(--fg);
+      background: var(--bg);
+      max-width: 40rem;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+    h2 { font-size: 1.1rem; margin-top: 2rem; }
+    .updated { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+    p, li { font-size: 0.95rem; }
+    ul { padding-left: 1.25rem; }
+    strong { font-weight: 600; }
+    a { color: inherit; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+    footer { color: var(--muted); font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated: November 5, 2026</p>
+
+  <p>
+    <strong>totp</strong> is a self-hosted authenticator browser extension.
+    This policy explains what data it accesses, stores, and transmits.
+    The short version: <strong>nothing leaves your device.</strong>
+  </p>
+
+  <h2>Data we collect</h2>
+  <p>We do <strong>not</strong> collect any personal data. There is no account,
+    no analytics, no telemetry, and no crash reporting.</p>
+
+  <h2>Data we store (locally only)</h2>
+  <p>The extension stores the following in your browser's local extension
+    storage (<code>chrome.storage.local</code> / <code>chrome.storage.session</code>):</p>
+  <ul>
+    <li>Your authenticator accounts (issuer, name, secret keys), encrypted
+      with a key derived from your master password (AES-256-GCM,
+      PBKDF2).</li>
+    <li>A random salt and an encrypted verifier used to check your master
+      password.</li>
+    <li>The derived encryption key in session storage (memory-only,
+      cleared when the browser closes).</li>
+  </ul>
+  <p>This data never leaves your browser or device. Clearing the
+    extension's data removes it permanently.</p>
+
+  <h2>Data transmitted</h2>
+  <p>The extension makes <strong>no network requests</strong> of any kind.
+    It does not contact any servers, APIs, or third parties. QR code
+    scanning is performed entirely offline on screenshots of the tab you
+    are viewing, using a bundled library.</p>
+
+  <h2>Permissions</h2>
+  <ul>
+    <li><strong>Storage</strong> — to save your encrypted vault and
+      session state locally.</li>
+    <li><strong>Active tab / Scripting</strong> — to capture a screenshot
+      of the current tab (for QR scanning) and, if you choose, draw a
+      region-selection overlay on the page.</li>
+    <li><strong>Notifications</strong> — to alert you when a region scan
+      finds a QR code after the popup has closed.</li>
+  </ul>
+  <p>Screenshots are processed in memory only and are not saved or
+    uploaded.</p>
+
+  <h2>Third parties</h2>
+  <p>We do not share, sell, or transfer any data to third parties,
+    because we never receive any data in the first place.</p>
+
+  <h2>Children's privacy</h2>
+  <p>The extension does not target children and collects no data from
+    anyone, including children.</p>
+
+  <h2>Changes to this policy</h2>
+  <p>If the extension's data practices change, this policy will be
+    updated and the revision date above will be changed. Any future
+    version that transmits data off-device will be disclosed clearly
+    here and in the extension listing before it ships.</p>
+
+  <h2>Contact</h2>
+  <p>
+    Questions about this policy: open an issue on
+    <a href="https://github.com/dshaw0004/totp">github.com/dshaw0004/totp</a>
+    or contact the project maintainer.
+  </p>
+
+  <hr />
+  <footer>
+    totp — self-hosted authenticator. No cloud, no sync, no telemetry.
+    · <a href="https://github.com/dshaw0004/totp">GitHub</a>
+  </footer>
+</body>
+</html>

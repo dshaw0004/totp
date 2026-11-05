@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>totp — Self-hosted authenticator extension</title>
+  <meta name="description" content="Scan QR codes on the page, store secrets encrypted with a master password, generate TOTP/HOTP codes on demand. No cloud, no sync, no telemetry." />
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #fafafa;
+      --fg: #111;
+      --muted: #555;
+      --card: #fff;
+      --border: #e5e5e5;
+      --accent: #2e7d32;
+      --accent-fg: #fff;
+      --code-bg: #f0f0f0;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0e0e0e;
+        --fg: #f2f2f2;
+        --muted: #a0a0a0;
+        --card: #1a1a1a;
+        --border: #2a2a2a;
+        --accent: #66bb6a;
+        --accent-fg: #0e0e0e;
+        --code-bg: #222;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      color: var(--fg);
+      background: var(--bg);
+    }
+    a { color: inherit; }
+    .wrap {
+      max-width: 64rem;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    /* Nav */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 0;
+    }
+    .brand {
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .nav-links a {
+      text-decoration: none;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+    .nav-links a:hover { color: var(--fg); }
+
+    /* Buttons */
+    .btn {
+      display: inline-block;
+      padding: 0.65rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--accent-fg);
+    }
+    .btn-primary:hover { filter: brightness(1.08); }
+    .btn-ghost {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--fg);
+    }
+    .btn-ghost:hover { border-color: var(--muted); }
+
+    /* Hero */
+    header.hero {
+      padding: 4.5rem 0 3.5rem;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: clamp(2.25rem, 5vw, 3.5rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin: 0 0 1rem;
+    }
+    .hero .tagline {
+      font-size: 1.2rem;
+      color: var(--muted);
+      max-width: 36rem;
+      margin: 0 auto 2rem;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .hero-note {
+      margin-top: 1.25rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    /* Sections */
+    section { padding: 3rem 0; }
+    section h2 {
+      font-size: 1.75rem;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.5rem;
+      text-align: center;
+    }
+    section .section-sub {
+      text-align: center;
+      color: var(--muted);
+      max-width: 32rem;
+      margin: 0 auto 2.5rem;
+    }
+
+    /* Feature grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .card .icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+    .card h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.05rem;
+    }
+    .card p {
+      margin: 0;
+      font-size: 0.925rem;
+      color: var(--muted);
+    }
+
+    /* How it works */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+      gap: 1.5rem;
+      counter-reset: step;
+    }
+    .step {
+      text-align: center;
+      padding: 1rem;
+    }
+    .step::before {
+      counter-increment: step;
+      content: counter(step);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--accent-fg);
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .step h3 { margin: 0 0 0.4rem; font-size: 1rem; }
+    .step p { margin: 0; font-size: 0.9rem; color: var(--muted); }
+
+    /* Security band */
+    .security {
+      background: var(--card);
+      border-block: 1px solid var(--border);
+    }
+    .security .grid { margin-top: 0.5rem; }
+
+    /* Install */
+    .install-box {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      margin: 1.5rem auto 0;
+      max-width: 32rem;
+      text-align: left;
+    }
+    .install-box .comment { color: var(--muted); }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    footer a { color: var(--fg); }
+
+    @media (max-width: 480px) {
+      .nav-links a:not(.btn) { display: none; }
+      header.hero { padding-top: 3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav>
+      <a class="brand" href="#">totp</a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#install">Install</a>
+        <a href="https://github.com/dshaw0004/totp" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn btn-primary" href="https://github.com/dshaw0004/totp" target="_blank" rel="noopener">Get extension</a>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <h1>Your authenticator.<br />Your browser. Your secrets.</h1>
+      <p class="tagline">
+        Self-hosted TOTP/HOTP extension. Scan QR codes on the page, encrypt
+        secrets with a master password, generate codes on demand — offline.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#install">Install extension</a>
+        <a class="btn btn-ghost" href="https://github.com/dshaw0004/totp" target="_blank" rel="noopener">View source on GitHub</a>
+      </div>
+      <p class="hero-note">No cloud · No sync · No telemetry</p>
+    </header>
+
+    <section id="features">
+      <h2>Built for people who want control</h2>
+      <p class="section-sub">Everything runs locally. Nothing is sent anywhere.</p>
+      <div class="grid">
+        <div class="card">
+          <span class="icon">🔒</span>
+          <h3>Encrypted vault</h3>
+          <p>Secrets are encrypted with AES-256-GCM before touching disk.
+            Key derived from your master password via PBKDF2 (250k
+            iterations). Forgetting the password means the vault is gone —
+            by design.</p>
+        </div>
+        <div class="card">
+          <span class="icon">📷</span>
+          <h3>Scan QR on-page</h3>
+          <p>Click + Add new and the extension screenshots the visible tab
+            to find a QR code — or drag a region around it. Decoding runs
+            offline with a bundled library.</p>
+        </div>
+        <div class="card">
+          <span class="icon">⌨️</span>
+          <h3>Manual entry</h3>
+          <p>Type in a base32 secret when a site won't give you a QR code.
+            Full control over digits, algorithm, and TOTP/HOTP type.</p>
+        </div>
+        <div class="card">
+          <span class="icon">📦</span>
+          <h3>Google Authenticator import</h3>
+          <p>Handles bulk export format (<code>otpauth-migration://</code>)
+            as well as standard <code>otpauth://</code> URIs — with a
+            zero-dependency protobuf parser.</p>
+        </div>
+        <div class="card">
+          <span class="icon">⚡</span>
+          <h3>TOTP &amp; HOTP</h3>
+          <p>Codes generated on demand via WebCrypto HMAC. Countdown timer
+            per account, manual counter generation for HOTP.</p>
+        </div>
+        <div class="card">
+          <span class="icon">🌐</span>
+          <h3>Zero network</h3>
+          <p>No analytics, no crash reports, no accounts, no servers. The
+            extension never makes a network request.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="how">
+      <h2>How it works</h2>
+      <p class="section-sub">Three steps from install to codes.</p>
+      <div class="steps">
+        <div class="step">
+          <h3>Set a master password</h3>
+          <p>It derives the encryption key for your vault. Cached for the
+            browser session only — lock anytime with one click.</p>
+        </div>
+        <div class="step">
+          <h3>Add an account</h3>
+          <p>Scan a QR on the page, drag-select the region, or enter the
+            secret manually.</p>
+        </div>
+        <div class="step">
+          <h3>Generate codes</h3>
+          <p>Open the popup to see live TOTP codes with countdown timers,
+            or generate HOTP codes on demand.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="security">
+      <h2>Security model</h2>
+      <p class="section-sub">What's on disk, and what isn't.</p>
+      <div class="grid">
+        <div class="card">
+          <h3>Stored locally</h3>
+          <p>A random salt, an encrypted verifier, and the encrypted
+            account vault. No plaintext secrets ever written to
+            <code>chrome.storage.local</code>.</p>
+        </div>
+        <div class="card">
+          <h3>Session only</h3>
+          <p>The derived key lives in memory-backed session storage and
+            clears when the browser closes. Not synced, not persisted.</p>
+        </div>
+        <div class="card">
+          <h3>No backdoor</h3>
+          <p>No password reset, no recovery, no master key escrow. Your
+            master password is the only way in — keep it safe.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="install">
+      <h2>Install</h2>
+      <p class="section-sub">Load it unpacked in a minute.</p>
+      <div class="install-box">
+        <div><span class="comment"># Chrome / Edge</span></div>
+        <div>chrome://extensions → Developer mode → Load unpacked</div>
+        <div style="margin-top: 0.75rem"><span class="comment"># Firefox</span></div>
+        <div>about:debugging → This Firefox → Load Temporary Add-on</div>
+      </div>
+      <div class="hero-actions" style="margin-top: 1.75rem">
+        <a class="btn btn-primary" href="https://github.com/dshaw0004/totp" target="_blank" rel="noopener">Get it on GitHub</a>
+        <a class="btn btn-ghost" href="privacy.html">Privacy policy</a>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <p>
+      totp — self-hosted authenticator ·
+      <a href="https://github.com/dshaw0004/totp" target="_blank" rel="noopener">GitHub</a>
+      ·
+      <a href="privacy.html">Privacy</a>
+    </p>
+  </footer>
+</body>
+</html>
